@@ -21,7 +21,8 @@ public class CarpetCommands {
         handler.registerCommand(new CommandGrow());
         handler.registerCommand(new CommandLagSpike());
         handler.registerCommand(new CommandLight());
-        handler.registerCommand(new CommandLoadChunk());
+        handler.registerCommand(new CommandChunk());
+        handler.registerCommand(new CommandLoadedChunks());
         handler.registerCommand(new CommandLog());
         handler.registerCommand(new CommandPerimeter());
         handler.registerCommand(new CommandPing());

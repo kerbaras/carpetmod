@@ -5,7 +5,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CarpetProfiler
@@ -325,50 +327,5 @@ public class CarpetProfiler
         current_section_start = 0L;
         current_section = null;
 
-    }
-
-    public static List<Stack<Long>> threads = new ArrayList<>();
-    public static boolean lastQuestProfiler = false;
-    public static boolean lastQuestProfilerStart = false;
-    public static boolean endLastQuestProfile = false;
-
-    public static ThreadLocal<Stack<Long>> profileLastQuest = new ThreadLocal<>();
-    public static ThreadLocal<Boolean> mainThread = ThreadLocal.withInitial(() -> false);
-
-    public static void fallingBlockProfile() {
-        threads.clear();
-        mainThread.set(true);
-        initThread();
-        lastQuestProfilerStart = true;
-        endLastQuestProfile = true;
-    }
-
-    public static void endCarpetProfiler(MinecraftServer minecraftServer) {
-        if(lastQuestProfiler) {
-            while(endLastQuestProfile) {
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            reportOfLastQuestProfiler(minecraftServer);
-            lastQuestProfiler = false;
-            lastQuestProfilerStart = false;
-        }
-    }
-
-    private static void reportOfLastQuestProfiler(MinecraftServer server) {
-        for(Stack<Long> s : threads) {
-            while(!s.empty()){
-                Messenger.print_server_message(server, Long.toString(s.pop()));
-            }
-        }
-    }
-
-    public static void initThread() {
-        Stack<Long> stack = new Stack<>();
-        threads.add(stack);
-        profileLastQuest.set(stack);
     }
 }
