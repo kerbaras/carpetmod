@@ -21,12 +21,3 @@
      }
  
      public static void func_176450_d(final World p_176450_0_, final BlockPos p_176450_1_)
-@@ -102,6 +109,8 @@
-             public void run()
-             {
-                 Chunk chunk = p_176450_0_.func_175726_f(p_176450_1_);
-+                BlockPos newPos = new BlockPos(chunk.field_76635_g * 16, 100, chunk.field_76647_h * 16);
-+                p_176450_0_.func_175656_a(newPos, Blocks.field_150350_a.func_176223_P());
- 
-                 for (int i = p_176450_1_.func_177956_o() - 1; i >= 0; --i)
-                 {
