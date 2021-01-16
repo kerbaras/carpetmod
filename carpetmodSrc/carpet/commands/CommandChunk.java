@@ -61,8 +61,8 @@ public class CommandChunk extends CommandCarpetBase
             throw new WrongUsageException(getUsage(sender));
         }
 
-        int chunkX = args[0].equals("~") ? sender.getPosition().getX() >> 4 : parseInt(args[0]);
-        int chunkZ = args[1].equals("~") ? sender.getPosition().getZ() >> 4 : parseInt(args[1]);
+        int chunkX = parseChunkPosition(args[0], sender.getPosition().getX());
+        int chunkZ = parseChunkPosition(args[1], sender.getPosition().getZ());
 
         world = sender.getEntityWorld();
         try {
@@ -113,9 +113,9 @@ public class CommandChunk extends CommandCarpetBase
         int chunkZ = sender.getPosition().getZ() >> 4;
 
         if (args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkX));
+            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkX), "~");
         } else if (args.length == 2) {
-            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkZ));
+            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkZ), "~");
         } else if (args.length == 3) {
             return getListOfStringsMatchingLastWord(args, "info", "load", "unload");
         } else {

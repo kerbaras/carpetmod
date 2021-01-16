@@ -52,7 +52,13 @@ public class CommandLoadedChunks extends CommandCarpetBase
                     sender.sendMessage(new TextComponentString(String.format("Hashmap size is %d, %.2f", loadedChunks.size(), getFillLevel(loadedChunks) )));
                     break;
                 case "search":
-                    search(sender, parseInt(args[1]), parseInt(args[2]));
+                    search(sender, parseChunkPosition(args[1], sender.getPosition().getX()), parseChunkPosition(args[2], sender.getPosition().getZ()));
+                    break;
+                case "remove":
+                    remove(sender, parseChunkPosition(args[1], sender.getPosition().getX()), parseChunkPosition(args[2], sender.getPosition().getZ()));
+                    break;
+                case "add":
+                    add(sender, parseChunkPosition(args[1], sender.getPosition().getX()), parseChunkPosition(args[2], sender.getPosition().getZ()));
                     break;
                 case "inspect":
                     Object[] chunks = getValues(loadedChunks);
@@ -77,8 +83,8 @@ public class CommandLoadedChunks extends CommandCarpetBase
                     ArrayList<String> inspections = new ArrayList<>();
                     String last = "";
                     int lastN = 0;
-                    for (int i = start; i < end; i++) {
-                        Chunk chunk = (Chunk) chunks[i];
+                    for (int i = start; (i & mask) != (end & mask); i++) {
+                        Chunk chunk = (Chunk) chunks[i & mask];
                         if(keyClass.isPresent()){
                             if(chunk == null){
                                 if(!last.equals("null")){
@@ -107,7 +113,7 @@ public class CommandLoadedChunks extends CommandCarpetBase
                             last = "";
                             lastN = 0;
                         }
-                        String formatted = formatChunk(chunk, i, mask);
+                        String formatted = formatChunk(chunk, i & mask, mask);
                         inspections.add(formatted);
 
                     }
@@ -137,6 +143,37 @@ public class CommandLoadedChunks extends CommandCarpetBase
             sender.sendMessage(new TextComponentString(formatChunk(chunk,i, mask)));
             break;
         }
+    }
+
+    protected static HashMap<Long, Chunk> tempChunks = new HashMap<>();
+
+    protected void add(ICommandSender sender, int x, int z) {
+        long hash = ChunkPos.asLong(x, z);
+        if(!tempChunks.containsKey(hash)){
+            sender.sendMessage(new TextComponentString(String.format("Chunk (%d, %d) couldn't been found", x, z)));
+            return;
+        }
+        Chunk chunk = tempChunks.get(hash);
+        Long2ObjectOpenHashMap<Chunk> loadedChunks = getLoadedChunks();
+        loadedChunks.put(hash, chunk);
+        sender.sendMessage(new TextComponentString(String.format("Chunk (%d, %d) has been added back", x, z)));
+    }
+
+    protected void remove(ICommandSender sender, int x, int z) {
+        long hash = ChunkPos.asLong(x, z);
+
+        Long2ObjectOpenHashMap<Chunk> loadedChunks = getLoadedChunks();
+        if(!loadedChunks.containsKey(hash)){
+            sender.sendMessage(new TextComponentString(String.format("Chunk (%d, %d) is not in loaded list", x, z)));
+        }
+        Chunk chunk = loadedChunks.remove(hash);
+        tempChunks.put(hash, chunk);
+        sender.sendMessage(new TextComponentString(String.format("Chunk (%d, %d) has been removed", x, z)));
+    }
+
+    protected Long2ObjectOpenHashMap<Chunk> getLoadedChunks(){
+        ChunkProviderServer provider = (ChunkProviderServer) world.getChunkProvider();
+        return (Long2ObjectOpenHashMap<Chunk>) provider.loadedChunks;
     }
 
     public String formatChunk(Chunk chunk, int pos, int mask){
@@ -198,9 +235,8 @@ public class CommandLoadedChunks extends CommandCarpetBase
 
         if (args.length == 1)
         {
-            //currently for all, needs to be restricted for Fake plaeyrs
             return getListOfStringsMatchingLastWord(args,
-                    "size", "inspect", "search");
+                    "size", "inspect", "search", "remove", "add");
         }
 
         switch (args[0]){
@@ -214,9 +250,11 @@ public class CommandLoadedChunks extends CommandCarpetBase
                 return getListOfStringsMatchingLastWord(args,
                         "class", "from", "to");
             case "search":
+            case "remove":
+            case "add":
                 if (args.length > 3)
                     return Collections.emptyList();
-                return getChunkCompletitions(sender, args, 1);
+                return getChunkCompletitions(sender, args, 2);
         }
 
         return Collections.emptyList();
@@ -228,9 +266,9 @@ public class CommandLoadedChunks extends CommandCarpetBase
         int chunkZ = sender.getPosition().getZ() >> 4;
 
         if (args.length == index) {
-            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkX));
+            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkX), "~");
         } else if (args.length == index + 1) {
-            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkZ));
+            return getListOfStringsMatchingLastWord(args, Integer.toString(chunkZ), "~");
         } else {
             return Collections.emptyList();
         }
