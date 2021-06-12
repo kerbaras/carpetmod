@@ -13,9 +13,14 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
+import test.CustomHashMap;
 
 import javax.annotation.Nullable;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,7 +49,7 @@ public class CommandLoadedChunks extends CommandCarpetBase
 
         world = sender.getEntityWorld();
         ChunkProviderServer provider = (ChunkProviderServer) world.getChunkProvider();
-        Long2ObjectOpenHashMap<Chunk> loadedChunks = (Long2ObjectOpenHashMap<Chunk>) provider.loadedChunks;
+        CustomHashMap<Chunk> loadedChunks = (CustomHashMap<Chunk>) provider.loadedChunks;
 
         try {
             switch (args[0]){
@@ -119,6 +124,25 @@ public class CommandLoadedChunks extends CommandCarpetBase
                     }
                     String result = inspections.stream().collect(Collectors.joining(", ", "[", "]"));
                     sender.sendMessage(new TextComponentString(result));
+                    break;
+                case "dump":
+                    String fileName = "loadedchunks-" + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSSS").format(new Date()) + ".csv";
+                    try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(fileName)))) {
+                        pw.println("index,key,x,z,hash");
+                        long[] keys = loadedChunks.getKey();
+                        Object[] values = loadedChunks.getValues();
+                        for (int i = 0, n = loadedChunks.getHashSize(); i <= n; i++) {
+                            long key = keys[i];
+                            Chunk val = (Chunk) values[i];
+                            if (val == null) {
+                                pw.println(i + ",,,,");
+                            } else {
+                                pw.printf("%d,%d,%d,%d,%d\n", i, key, val.x, val.z, HashCommon.mix(key) & (n - 1));
+                            }
+                        }
+                        pw.flush();
+                    }
+                    notifyCommandListener(sender, this, "Written to %s", fileName);
                     break;
                 default:
                     throw new WrongUsageException(getUsage(sender));
@@ -236,7 +260,7 @@ public class CommandLoadedChunks extends CommandCarpetBase
         if (args.length == 1)
         {
             return getListOfStringsMatchingLastWord(args,
-                    "size", "inspect", "search", "remove", "add");
+                    "size", "inspect", "search", "remove", "add", "dump");
         }
 
         switch (args[0]){

@@ -8,6 +8,18 @@ public class CustomHashMap<V> extends Long2ObjectOpenHashMap<V> {
         super(expected);
     }
 
+    public long[] getKey() {
+        return key;
+    }
+
+    public V[] getValues() {
+        return value;
+    }
+
+    public int getHashSize() {
+        return n;
+    }
+
 //    @Override
 //    public V get(long k) {
 //        if (((k) == (0))) return containsNullKey ? value[n] : defRetValue;
