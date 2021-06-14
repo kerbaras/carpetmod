@@ -9,15 +9,18 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import test.Test;
 
 import javax.annotation.Nullable;
+import java.text.NumberFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -47,13 +50,16 @@ public class CommandChunk extends CommandCarpetBase
         if (!command_enabled("commandChunk", sender)) return;
 
         if (args.length == 1 && args[0].equals("test")) {
+            sender.sendMessage(new TextComponentString(TextFormatting.BOLD + "Profile results:"));
             List<Map.Entry<String, Long>> chunks = Test.profileResults.entrySet().stream().sorted(Map.Entry.comparingByValue()).collect(Collectors.toList());
             for (int i = 0; i < chunks.size(); i++) {
                 Map.Entry<String, Long> entry = chunks.get(i);
                 long time = i == 0 ? 0 : entry.getValue() - chunks.get(i - 1).getValue();
                 long absTime = entry.getValue() - chunks.get(0).getValue();
-                sender.sendMessage(new TextComponentString("- " + entry.getKey() + ": " + absTime + " / " + time));
+                NumberFormat format = NumberFormat.getNumberInstance(Locale.ENGLISH);
+                sender.sendMessage(new TextComponentString("- " + entry.getKey() + ": " + format.format(absTime) + " / " + format.format(time)));
             }
+            return;
         }
 
         if (args.length != 3)

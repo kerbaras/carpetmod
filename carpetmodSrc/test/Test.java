@@ -14,7 +14,10 @@ public class Test {
     private static final Long2ObjectMap<String> map = new Long2ObjectOpenHashMap<>();
 
     public static Map<String, Long> profileResults = new HashMap<>();
-    public static boolean isBeaconTick = false;
+    public static boolean isFirstBeacon = false;
+    public static boolean isGlassRemoved = false;
+    public static boolean wasRehashChunkLoaded = false;
+    public static boolean loggedRehashBeacon = true;
 
     public static void main(String[] args) {
         for (int x = -7; x <= 8; x++) {
