@@ -18,6 +18,7 @@ public class Test {
     public static boolean isGlassRemoved = false;
     public static boolean wasRehashChunkLoaded = false;
     public static boolean loggedRehashBeacon = true;
+    public static boolean loggedRehashBeaconEnd = true;
 
     public static void main(String[] args) {
         for (int x = -7; x <= 8; x++) {
