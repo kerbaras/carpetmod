@@ -51,7 +51,7 @@
 +        Iterator<Map.Entry<ChunkPos, NBTTagCompound>> iter =
 +                field_75828_a.entrySet().iterator();
 +        Map.Entry<ChunkPos, NBTTagCompound> entry = iter.next();
-+        if (entry.getKey().field_77276_a == -26 && entry.getKey().field_77275_b == 9) {
++        if (CarpetSettings.preventRehashChunkWrite && entry.getKey().field_77276_a == -26 && entry.getKey().field_77275_b == 9) {
 +            if (!iter.hasNext()) return null;
 +            entry = iter.next();
 +        }

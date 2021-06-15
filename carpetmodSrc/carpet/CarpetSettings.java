@@ -473,6 +473,9 @@ public class CarpetSettings
     @Rule(desc = "When true, the game acts as if a permaloader is running", category = CREATIVE)
     public static boolean simulatePermaloader = false;
 
+    @Rule(desc = "Prevent the rehash chunk from ever leaving the save queue", category = CREATIVE)
+    public static boolean preventRehashChunkWrite = false;
+
     // ===== FIXES ===== //
     /*
      * Rules in this category should end with the "Fix" suffix
