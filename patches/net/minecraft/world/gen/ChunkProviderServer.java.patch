@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/world/gen/ChunkProviderServer.java
 +++ ../src-work/minecraft/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -27,15 +27,28 @@
+@@ -27,15 +27,29 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -12,6 +12,7 @@
 +import net.minecraft.entity.Entity;
 +import net.minecraft.server.management.PlayerChunkMapEntry;
 +import test.CustomHashMap;
++import test.LastQuestInCode;
 +import test.Test;
 +
  public class ChunkProviderServer implements IChunkProvider
@@ -33,7 +34,7 @@
      public ChunkProviderServer(WorldServer p_i46838_1_, IChunkLoader p_i46838_2_, IChunkGenerator p_i46838_3_)
      {
          this.field_73251_h = p_i46838_1_;
-@@ -50,8 +63,18 @@
+@@ -50,8 +64,18 @@
  
      public void func_189549_a(Chunk p_189549_1_)
      {
@@ -53,7 +54,7 @@
              this.field_73248_b.add(Long.valueOf(ChunkPos.func_77272_a(p_189549_1_.field_76635_g, p_189549_1_.field_76647_h)));
              p_189549_1_.field_189550_d = true;
          }
-@@ -59,6 +82,7 @@
+@@ -59,6 +83,7 @@
  
      public void func_73240_a()
      {
@@ -61,7 +62,7 @@
          ObjectIterator objectiterator = this.field_73244_f.values().iterator();
  
          while (objectiterator.hasNext())
-@@ -76,6 +100,11 @@
+@@ -76,6 +101,11 @@
  
          if (chunk != null)
          {
@@ -73,7 +74,7 @@
              chunk.field_189550_d = false;
          }
  
-@@ -85,6 +114,8 @@
+@@ -85,17 +115,40 @@
      @Nullable
      public Chunk func_186028_c(int p_186028_1_, int p_186028_2_)
      {
@@ -82,7 +83,11 @@
          Chunk chunk = this.func_186026_b(p_186028_1_, p_186028_2_);
  
          if (chunk == null)
-@@ -93,9 +124,27 @@
+         {
++            if (LastQuestInCode.enabled) {
++                LastQuestInCode.onChunkLoad();
++            }
+             chunk = this.func_73239_e(p_186028_1_, p_186028_2_);
  
              if (chunk != null)
              {
@@ -110,19 +115,39 @@
              }
          }
  
-@@ -113,6 +162,11 @@
+@@ -108,32 +161,44 @@
+ 
+         if (chunk == null)
+         {
+-            long i = ChunkPos.func_77272_a(p_186025_1_, p_186025_2_);
++            chunk = generateChunk(p_186025_1_, p_186025_2_);
++        }
+ 
++        return chunk;
++    }
++
++    // Split off from provideChunk
++    public Chunk generateChunk(int x, int z) {
++        Chunk chunk;
++            long i = ChunkPos.func_77272_a(x, z);
++
              try
              {
-                 chunk = this.field_186029_c.func_185932_a(p_186025_1_, p_186025_2_);
+-                chunk = this.field_186029_c.func_185932_a(p_186025_1_, p_186025_2_);
++                chunk = this.field_186029_c.func_185932_a(x, z);
 +                
 +            	// ChunkLogger - 0x-CARPET
 +                if(CarpetClientChunkLogger.logger.enabled) {
-+                	CarpetClientChunkLogger.logger.log(this.field_73251_h,p_186025_1_,p_186025_2_,CarpetClientChunkLogger.Event.GENERATING);
++                	CarpetClientChunkLogger.logger.log(this.field_73251_h,x,z,CarpetClientChunkLogger.Event.GENERATING);
 +                }
              }
              catch (Throwable throwable)
              {
-@@ -123,7 +177,7 @@
+                 CrashReport crashreport = CrashReport.func_85055_a(throwable, "Exception generating new chunk");
+                 CrashReportCategory crashreportcategory = crashreport.func_85058_a("Chunk to be generated");
+-                crashreportcategory.func_71507_a("Location", String.format("%d,%d", p_186025_1_, p_186025_2_));
++                crashreportcategory.func_71507_a("Location", String.format("%d,%d", x, z));
+                 crashreportcategory.func_71507_a("Position hash", Long.valueOf(i));
                  crashreportcategory.func_71507_a("Generator", this.field_186029_c);
                  throw new ReportedException(crashreport);
              }
@@ -131,7 +156,18 @@
              this.field_73244_f.put(i, chunk);
              chunk.func_76631_c();
              chunk.func_186030_a(this, this.field_186029_c);
-@@ -185,6 +239,8 @@
+-        }
+-
+         return chunk;
+     }
+ 
+     @Nullable
+-    private Chunk func_73239_e(int p_73239_1_, int p_73239_2_)
++    public Chunk func_73239_e(int p_73239_1_, int p_73239_2_)
+     {
+         try
+         {
+@@ -185,6 +250,8 @@
  
      public boolean func_186027_a(boolean p_186027_1_)
      {
@@ -140,7 +176,7 @@
          int i = 0;
          List<Chunk> list = Lists.newArrayList(this.field_73244_f.values());
  
-@@ -222,25 +278,62 @@
+@@ -222,25 +289,62 @@
      {
          if (!this.field_73251_h.field_73058_d)
          {
@@ -205,7 +241,7 @@
  
              this.field_73247_e.func_75817_a();
          }
-@@ -283,9 +376,17 @@
+@@ -283,9 +387,17 @@
      {
          return this.field_73244_f.containsKey(ChunkPos.func_77272_a(p_73149_1_, p_73149_2_));
      }
