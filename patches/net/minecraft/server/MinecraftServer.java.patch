@@ -17,7 +17,7 @@
  import javax.annotation.Nullable;
  import javax.imageio.ImageIO;
  import net.minecraft.advancements.AdvancementManager;
-@@ -86,6 +88,17 @@
+@@ -86,6 +88,18 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -29,13 +29,14 @@
 +import carpet.utils.CarpetProfiler;
 +import carpet.utils.PistonFixes;
 +import carpet.utils.TickingArea;
++import test.AccurateTimer;
 +import test.LastQuestInCode;
 +import test.Test;
 +
  public abstract class MinecraftServer implements ICommandSender, Runnable, IThreadListener, ISnooperInfo
  {
      private static final Logger field_147145_h = LogManager.getLogger();
-@@ -144,6 +157,7 @@
+@@ -144,6 +158,7 @@
  
      public MinecraftServer(File p_i47054_1_, Proxy p_i47054_2_, DataFixer p_i47054_3_, YggdrasilAuthenticationService p_i47054_4_, MinecraftSessionService p_i47054_5_, GameProfileRepository p_i47054_6_, PlayerProfileCache p_i47054_7_)
      {
@@ -43,7 +44,7 @@
          this.field_110456_c = p_i47054_2_;
          this.field_152364_T = p_i47054_4_;
          this.field_147143_S = p_i47054_5_;
-@@ -273,7 +287,9 @@
+@@ -273,7 +288,9 @@
  
          this.field_71318_t.func_72364_a(this.field_71305_c);
          this.func_147139_a(this.func_147135_j());
@@ -53,7 +54,7 @@
      }
  
      protected void func_71222_d()
-@@ -285,25 +301,32 @@
+@@ -285,25 +302,32 @@
          int i1 = 0;
          this.func_71192_d("menu.generatingTerrain");
          int j1 = 0;
@@ -101,7 +102,7 @@
              }
          }
  
-@@ -341,7 +364,7 @@
+@@ -341,7 +365,7 @@
  
      public abstract boolean func_183002_r();
  
@@ -110,7 +111,7 @@
      {
          this.field_71302_d = p_71216_1_;
          this.field_71303_e = p_71216_2_;
-@@ -375,6 +398,7 @@
+@@ -375,6 +399,7 @@
                  }
              }
          }
@@ -118,7 +119,7 @@
      }
  
      protected void func_71260_j()
-@@ -389,6 +413,8 @@
+@@ -389,6 +414,8 @@
          if (this.field_71318_t != null)
          {
              field_147145_h.info("Saving players");
@@ -127,7 +128,7 @@
              this.field_71318_t.func_72389_g();
              this.field_71318_t.func_72392_r();
          }
-@@ -450,18 +476,33 @@
+@@ -450,18 +477,33 @@
              {
                  this.field_175591_ab = func_130071_aq();
                  long i = 0L;
@@ -163,7 +164,7 @@
                          j = 2000L;
                          this.field_71299_R = this.field_175591_ab;
                      }
-@@ -474,6 +515,7 @@
+@@ -474,6 +516,7 @@
  
                      i += j;
                      this.field_175591_ab = k;
@@ -171,7 +172,7 @@
  
                      if (this.field_71305_c[0].func_73056_e())
                      {
-@@ -482,14 +524,33 @@
+@@ -482,14 +525,33 @@
                      }
                      else
                      {
@@ -208,7 +209,7 @@
                      this.field_71296_Q = true;
                  }
              }
-@@ -594,6 +655,20 @@
+@@ -594,6 +656,20 @@
          long i = System.nanoTime();
          ++this.field_71315_w;
  
@@ -229,7 +230,7 @@
          if (this.field_71295_T)
          {
              this.field_71295_T = false;
-@@ -620,13 +695,24 @@
+@@ -620,13 +696,24 @@
              this.field_147147_p.func_151318_b().func_151330_a(agameprofile);
          }
  
@@ -254,7 +255,7 @@
  
          this.field_71304_b.func_76320_a("tallying");
          this.field_71311_j[this.field_71315_w % 100] = System.nanoTime() - i;
-@@ -645,12 +731,30 @@
+@@ -645,12 +732,30 @@
  
          this.field_71304_b.func_76319_b();
          this.field_71304_b.func_76319_b();
@@ -285,7 +286,7 @@
          synchronized (this.field_175589_i)
          {
              while (!this.field_175589_i.isEmpty())
-@@ -658,6 +762,7 @@
+@@ -658,6 +763,7 @@
                  Util.func_181617_a(this.field_175589_i.poll(), field_147145_h);
              }
          }
@@ -293,7 +294,7 @@
  
          this.field_71304_b.func_76318_c("levels");
  
-@@ -672,6 +777,7 @@
+@@ -672,6 +778,7 @@
                  {
                      return worldserver.func_72912_H().func_76065_j();
                  });
@@ -301,7 +302,7 @@
  
                  if (this.field_71315_w % 20 == 0)
                  {
-@@ -686,27 +792,44 @@
+@@ -686,27 +793,44 @@
                  {
                      worldserver.func_72835_b();
                  }
@@ -348,7 +349,7 @@
                  this.field_71304_b.func_76319_b();
                  this.field_71304_b.func_76319_b();
              }
-@@ -714,10 +837,12 @@
+@@ -714,10 +838,12 @@
              this.field_71312_k[j][this.field_71315_w % 100] = System.nanoTime() - i;
          }
  
@@ -361,7 +362,7 @@
          this.field_71304_b.func_76318_c("commandFunctions");
          this.func_193030_aL().func_73660_a();
          this.field_71304_b.func_76318_c("tickables");
-@@ -728,6 +853,8 @@
+@@ -728,6 +854,8 @@
          }
  
          this.field_71304_b.func_76319_b();
@@ -370,7 +371,15 @@
      }
  
      public boolean func_71255_r()
-@@ -939,7 +1066,7 @@
+@@ -742,6 +870,7 @@
+ 
+     public static void main(String[] p_main_0_)
+     {
++        AccurateTimer.load();
+         Bootstrap.func_151354_b();
+ 
+         try
+@@ -939,7 +1068,7 @@
  
      public String getServerModName()
      {

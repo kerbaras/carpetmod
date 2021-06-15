@@ -1,6 +1,6 @@
 --- ../src-base/minecraft/net/minecraft/world/gen/ChunkProviderServer.java
 +++ ../src-work/minecraft/net/minecraft/world/gen/ChunkProviderServer.java
-@@ -27,15 +27,29 @@
+@@ -27,15 +27,30 @@
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
  
@@ -11,6 +11,7 @@
 +import carpet.utils.UnloadOrder;
 +import net.minecraft.entity.Entity;
 +import net.minecraft.server.management.PlayerChunkMapEntry;
++import test.AccurateTimer;
 +import test.CustomHashMap;
 +import test.LastQuestInCode;
 +import test.Test;
@@ -34,7 +35,7 @@
      public ChunkProviderServer(WorldServer p_i46838_1_, IChunkLoader p_i46838_2_, IChunkGenerator p_i46838_3_)
      {
          this.field_73251_h = p_i46838_1_;
-@@ -50,8 +64,18 @@
+@@ -50,8 +65,18 @@
  
      public void func_189549_a(Chunk p_189549_1_)
      {
@@ -54,7 +55,7 @@
              this.field_73248_b.add(Long.valueOf(ChunkPos.func_77272_a(p_189549_1_.field_76635_g, p_189549_1_.field_76647_h)));
              p_189549_1_.field_189550_d = true;
          }
-@@ -59,6 +83,7 @@
+@@ -59,6 +84,7 @@
  
      public void func_73240_a()
      {
@@ -62,7 +63,7 @@
          ObjectIterator objectiterator = this.field_73244_f.values().iterator();
  
          while (objectiterator.hasNext())
-@@ -76,6 +101,11 @@
+@@ -76,6 +102,11 @@
  
          if (chunk != null)
          {
@@ -74,11 +75,11 @@
              chunk.field_189550_d = false;
          }
  
-@@ -85,17 +115,40 @@
+@@ -85,17 +116,40 @@
      @Nullable
      public Chunk func_186028_c(int p_186028_1_, int p_186028_2_)
      {
-+        long startTime = System.nanoTime();
++        long startTime = AccurateTimer.rdtsc();
 +
          Chunk chunk = this.func_186026_b(p_186028_1_, p_186028_2_);
  
@@ -97,12 +98,12 @@
 +                }
 +
 +                if (p_186028_1_ == -26 && p_186028_2_ == 9) {
-+                    Test.profileResults.put("rehash_start", System.nanoTime());
++                    Test.profileResults.put("rehash_start", AccurateTimer.rdtsc());
 +                    Test.profileResults.put("chunk_load_start", startTime);
 +                }
                  this.field_73244_f.put(ChunkPos.func_77272_a(p_186028_1_, p_186028_2_), chunk);
 +                if (p_186028_1_ == -26 && p_186028_2_ == 9) {
-+                    Test.profileResults.put("rehash_end", System.nanoTime());
++                    Test.profileResults.put("rehash_end", AccurateTimer.rdtsc());
 +                    Test.loggedRehashBeacon = false;
 +                    Test.loggedRehashBeaconEnd = false;
 +                    Test.wasRehashChunkLoaded = true;
@@ -115,7 +116,7 @@
              }
          }
  
-@@ -108,32 +161,44 @@
+@@ -108,32 +162,44 @@
  
          if (chunk == null)
          {
@@ -167,7 +168,7 @@
      {
          try
          {
-@@ -185,6 +250,8 @@
+@@ -185,6 +251,8 @@
  
      public boolean func_186027_a(boolean p_186027_1_)
      {
@@ -176,7 +177,7 @@
          int i = 0;
          List<Chunk> list = Lists.newArrayList(this.field_73244_f.values());
  
-@@ -222,25 +289,62 @@
+@@ -222,25 +290,62 @@
      {
          if (!this.field_73251_h.field_73058_d)
          {
@@ -241,7 +242,7 @@
  
              this.field_73247_e.func_75817_a();
          }
-@@ -283,9 +387,17 @@
+@@ -283,9 +388,17 @@
      {
          return this.field_73244_f.containsKey(ChunkPos.func_77272_a(p_73149_1_, p_73149_2_));
      }

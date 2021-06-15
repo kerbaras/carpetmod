@@ -1,16 +1,17 @@
 --- ../src-base/minecraft/net/minecraft/block/BlockBeacon.java
 +++ ../src-work/minecraft/net/minecraft/block/BlockBeacon.java
-@@ -20,6 +20,9 @@
+@@ -20,6 +20,10 @@
  import net.minecraft.world.WorldServer;
  import net.minecraft.world.chunk.Chunk;
  
 +import carpet.CarpetSettings;
++import test.AccurateTimer;
 +import test.Test;
 +
  public class BlockBeacon extends BlockContainer
  {
      public BlockBeacon()
-@@ -93,17 +96,50 @@
+@@ -93,17 +97,50 @@
              ((TileEntityBeacon)tileentity).func_174908_m();
              p_189540_2_.func_175641_c(p_189540_3_, this, 1, 0);
          }
@@ -30,7 +31,7 @@
              public void run()
              {
 +                if (glassRemoved) {
-+                    long time = System.nanoTime();
++                    long time = AccurateTimer.rdtsc();
 +                    if (!Test.isFirstBeacon) {
 +                        Test.isFirstBeacon = true;
 +                        Test.profileResults.put("first_beacon_start", time);
@@ -62,7 +63,7 @@
                  {
                      final BlockPos blockpos = new BlockPos(p_176450_1_.func_177958_n(), i, p_176450_1_.func_177952_p());
  
-@@ -131,7 +167,31 @@
+@@ -131,7 +168,31 @@
                          });
                      }
                  }
@@ -76,7 +77,7 @@
 +//                }
 +//                System.out.println(glassPos.getY() - i);
 +                if (glassRemoved) {
-+                    long time = System.nanoTime();
++                    long time = AccurateTimer.rdtsc();
 +                    Test.profileResults.put("last_beacon_end", time);
 +                    if (!Test.wasRehashChunkLoaded) {
 +                        Test.profileResults.put("before_rehash_beacon_end", time);
